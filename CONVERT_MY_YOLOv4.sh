@@ -29,7 +29,8 @@ $PATH_PREFIX/bin/mo \
 --input_model output_dir/yolov4tiny.pb \
 --tensorflow_use_custom_operations_config json/GESTURES_yolo_v4_tiny.json \
 --batch 1 \
---data_type FP16 \
+--mean_values=[0,0,0] --scale_values=[255,255,255] \
+--data_type FP32 \
 --reverse_input_channels \
 --layout "nhwc->nchw" \
 --model_name yolov4tiny \
