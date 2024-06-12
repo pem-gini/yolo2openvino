@@ -1,3 +1,35 @@
+### usage
+
+ * get openvino c++ tooling (the compile tool is sadly not part of the pip package)
+    * there is a docker image containing openvino, but sadly this doesnt contain the myriad_plugin.so which is needed when compiling our model for oak devices
+ * so we download and build it ourselfs
+    * `git clone --depth 1 --recurse-submodules --branch 2021.3 https://github.com/openvinotoolkit/openvino`
+    * `cd openvino && ./install_build_dependencies.sh`
+    * `mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENCV=OFF -DENABLE_INTEL_GPU=OFF .. && make && cd ..`
+ * create conda env with python3.7.2
+ * activate conda env
+ * install openvino (older version is not in conda-forge channel) via pip inside the conda env
+   * we use python 3.7 because thats the working version for the openvino pipeline (at least that low version)
+   * we also install urllib3>2.0.0 because it supports newer ssl formats (which the current web app uses)
+   * we use python 3.7.2 because thats the first working version for urllib3>2.0.0 to work with
+ * use torch to convert the weights into tensor blob
+ * use openvino to convert tensor weights into intel openvino blob
+ * compile openvino blob into depthai pipeline using the depthai compiler (http web)
+ * leave conda env
+ * extract resulting zip archive 
+ * use blob inside your depthai camera pipeline
+
+```
+conda create -y --name openvino python==3.7.2
+conda install -f -y --name openvino pip
+conda activate openvino
+$CONDA_PREFIX/bin/pip install openvino-dev==2022.1.0 blobconverter tensorflow==1.15.5 protobuf==3.20.0 urllib3==2.0.0a1 fastjsonschema==2.15.1
+./CONVERT_MY_YOLOv4.sh $CONDA_PREFIX
+conda deactivate
+```
+
+
+
 **Deprecation notice**: This project is deprecated and not maintained, but can still be used locally with TensorFlow V1. We recommend switching to a newer version of Yolo (v5-v8). You can see our training and export tutorials [here](https://github.com/luxonis/depthai-ml-training/tree/master/colab-notebooks).
 
 # Yolo2OpenVINO
