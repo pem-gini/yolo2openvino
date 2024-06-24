@@ -21,15 +21,19 @@ peace
 peace_inv" > classnames.tmp.txt
 
 
+
+# INPUTDATATYPE="FP16"
+INPUTDATATYPE="FP16"
+ 
 ### conversion to tf
-python convert_weights_pb.py --yolo 4 --weights_file new_yolo4gestures.pt --class_names classnames.tmp.txt --output output_dir/yolov4tiny.pb --tiny -h 416 -w 416 -a 10,14,23,27,37,58,81,82,135,169,344,319
+python convert_weights_pb.py --yolo 4 --tiny  --weights_file yolov4-tiny-custom_best.weights --class_names classnames.tmp.txt --output output_dir/yolov4tiny.pb -h 416 -w 416 -a 10,14,23,27,37,58,81,82,135,169,344,319
 
 ### conversion to openvino
 $PATH_PREFIX/bin/mo \
 --input_model output_dir/yolov4tiny.pb \
 --tensorflow_use_custom_operations_config json/GESTURES_yolo_v4_tiny.json \
 --batch 1 \
---data_type FP16 \
+--data_type $INPUTDATATYPE \
 --reverse_input_channels \
 --layout "nhwc->nchw" \
 --model_name yolov4tiny \
@@ -42,7 +46,17 @@ rm classnames.tmp.txt
 
 ### compile to blob for inference on OAK devices using blobconverter api (which internally also uses depthai web app)
 ###https://blobconverter.luxonis.com/
-$PATH_PREFIX/bin/blobconverter -v 2022.1 -ox output_dir/yolov4tiny.xml -ob output_dir/yolov4tiny.bin -o output_dir --shaves 6
+$PATH_PREFIX/bin/blobconverter \
+-v 2022.1 \
+--shaves 6 \
+--no-cache \
+--data-type $INPUTDATATYPE \
+-ox output_dir/yolov4tiny.xml \
+-ob output_dir/yolov4tiny.bin \
+-o output_dir 
+
+#--compile-params "ipU8" \
+
 #### compile to blob using openvino toolkit locally
 # ./compile_tool -m output_dir/yolov4tiny.xml -d MYRIAD
 
