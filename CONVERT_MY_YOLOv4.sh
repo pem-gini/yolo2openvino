@@ -12,13 +12,13 @@ mkdir -p output_dir
 rm output_dir/*
 
 ### temporarily create classnames files
-echo "ok
-stop
-palm
-fist
+echo "fist
 like
+ok
+palm
 peace
-peace_inv" > classnames.tmp.txt
+peace_inv
+stop" > classnames.tmp.txt
 
 
 
